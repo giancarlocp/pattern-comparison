@@ -29,8 +29,8 @@ Then I will present as follow
 * Data Model & Actions - Meiosis Pattern
 * Actions - Elm Pattern
 
-**Note:** Meiosis use stream, and there two good options, *flyd* and *mithril-stream*.
-I choose the last, thus I will use *mithril.js* as the virtual-dom manager.
+**Note:** Meiosis use stream, and there are two good options, *flyd* and *mithril-stream*.
+I choose the latter, thus I will use *mithril.js* as the virtual-dom manager.
 
 
 
@@ -86,22 +86,19 @@ const app = {
     ],
   },
 
-  actions: (update) => ({
+  actions: (update, model) => ({
     showFormF:(showForm)=> update( { showForm } ),
     mealInput:  (desc)  => update( { desc } ),
     calInput:   (cals)  => update( { cals } ),
     saveMeal: () => {
-      const model = app.initialState;
       const { editId } = model;
       (editId) ? update(edit(model)) : update(add(model));
     },
     delMeal: (id)  => {
-      const model = app.initialState;
-      const meals = R.filter( meal => meal.id !== id, model.meals);
-      update({meals});
+      // Using the Patchinko power
+      update({meals: S(x => x.filter( meal => meal.id !== id)) });
     },
     editMeal: (editId)  => {
-      const model = app.initialState;
       const meal = R.find( meal => meal.id === editId, model.meals);
       const { cals, desc } = meal;
       update({desc, cals, editId, showForm:true});
