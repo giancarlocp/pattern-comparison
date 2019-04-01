@@ -17,6 +17,8 @@ https://github.com/knowthen/fpjs/blob/master/caloriecounter/PLAN.md
 
 First we will show the View/Component plan. It will be the same in both.
 
+* View Functions
+
 In Elm pattern we define Data aside Actions.
 Actions is a term used in Meiosis pattern and refer to "dispatch and messages" in the Elm terminology.
 
@@ -29,7 +31,13 @@ Then I will present as follow
 * Data Model & Actions - Meiosis Pattern
 * Actions - Elm Pattern
 
-**Note:** Meiosis use stream, and there are two good options, *flyd* and *mithril-stream*.
+At the end we define the pattern's core, the reaction mechanism.
+
+* Reaction Mechanism - Elm Pattern
+* Reaction Mechanism - Meiosis Pattern
+
+
+**Note:** Meiosis is builded on stream, and there are two good options, *flyd* and *mithril-stream*.
 I choose the latter, thus I will use *mithril.js* as the virtual-dom manager.
 
 
@@ -190,3 +198,32 @@ const edit = (model) => {
   return {...model, cals:0, desc:'', showForm:false, editId:null, meals};
 }
 ```
+
+
+### Reaction Mechanism - Elm Pattern
+
+```javascript
+function app(initModel, update, view, node) {
+  let model = initModel;
+  let curView = view(actions, model);
+  let rootNode = createElement(curView);
+  node.appendChild(rootNode);
+
+  function actions(msg) {
+    model = update(msg, model);
+    const updatedView = view(actions, model);
+    const patches = diff(curView, updatedView);
+    rootNode = patch(rootNode, patches);
+    curView = updatedView;
+  }
+}
+```
+
+### Reaction Mechanism - Meiosis Pattern
+
+```javascript
+const update = stream();
+const states = stream.scan(P, app.initialState, update);
+const actions = app.actions(update, app.initialState);
+```
+
