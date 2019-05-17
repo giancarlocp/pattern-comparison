@@ -6,7 +6,7 @@ A small comparison between two frontend Design Pattern:
 
 Check out the branches.
 
-https://github.com/giancarlocp/pattern-comparison/compare/elm...meiosis?expand=1
+https://github.com/giancarlocp/pattern-comparison/compare/master...meiosis?expand=1
 
 ## Calorie Counting App
 
@@ -61,17 +61,17 @@ view
 
 ```javascript
 const initModel = {
-  desc: 'Breakfast',
-  cals: 450,
-  showForm: false,
-  nextId: 5,
-  editId: null,
-  meals: [
-    {id: 1, cals:450, desc:'breakfast'},
-    {id: 2, cals:180, desc:'snack'},
-    {id: 3, cals:540, desc:'lunch'},
-    {id: 4, cals:450, desc:'dinner'},
-  ],
+    desc: 'Breakfast',
+    cals: 450,
+    showForm: false,
+    nextId: 5,
+    editId: null,
+    meals: [
+      {id: 1, cals:450, desc:'breakfast'},
+      {id: 2, cals:180, desc:'snack'},
+      {id: 3, cals:540, desc:'lunch'},
+      {id: 4, cals:450, desc:'dinner'},
+    ],
 }
 ```
 
@@ -102,8 +102,7 @@ const app = {
       const { editId } = model;
       (editId) ? update(edit(model)) : update(add(model));
     },
-    delMeal: (id)  => {
-      // Using the Patchinko power
+    delMeal: (id)  => { // S from Patchinko
       update({meals: S(x => x.filter( meal => meal.id !== id)) });
     },
     editMeal: (editId)  => {
@@ -226,4 +225,3 @@ const update = stream();
 const states = stream.scan(P, app.initialState, update);
 const actions = app.actions(update, app.initialState);
 ```
-
