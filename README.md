@@ -99,34 +99,34 @@ const app = {
     mealInput:  (desc)  => update( { desc } ),
     calInput:   (cals)  => update( { cals } ),
     saveMeal: () => {
-      const { editId } = model;
-      (editId) ? update(edit(model)) : update(add(model));
+      const { editId } = model();
+      (editId) ? update(edit(model)) : update(add(model))
     },
-    delMeal: (id)  => { // S from Patchinko
-      update({meals: S(x => x.filter( meal => meal.id !== id)) });
+    delMeal: (id)  => { // SUB from mergerino
+      update({meals: SUB(x => x.filter( meal => meal.id !== id)) })
     },
     editMeal: (editId)  => {
-      const meal = R.find( meal => meal.id === editId, model.meals);
-      const { cals, desc } = meal;
-      update({desc, cals, editId, showForm:true});
+      const meal = R.find( meal => meal.id === editId, model().meals)
+      const { cals, desc } = meal
+      update({desc, cals, editId, showForm:true})
     },
   }),
 }
 
 const add = (model) => {
-  const { nextId, cals, desc } = model;
-  const meal = { id: nextId, cals, desc };
-  const meals = [...model.meals, meal];
-  return {cals:0, desc:'', showForm:false, nextId:nextId+1, meals};
+  const { nextId, cals, desc } = model()
+  const meal = { id: nextId, cals, desc }
+  const meals = [...model().meals, meal]
+  return {cals:0, desc:'', showForm:false, nextId:nextId+1, meals}
 }
 const edit = (model) => {
-  const { editId, cals, desc } = model;
+  const { editId, cals, desc } = model()
   const meals = R.map( meal => {
       if (meal.id === editId)
-        return {...meal, cals, desc};
-      return meal;
-    }, model.meals);
-  return {cals:0, desc:'', showForm:false, editId:null, meals};
+        return {...meal, cals, desc}
+      return meal
+    }, model().meals)
+  return {cals:0, desc:'', showForm:false, editId:null, meals}
 }
 ```
 
@@ -136,65 +136,65 @@ const edit = (model) => {
 ```javascript
 export const showFormF = (showForm) => ({
   type: 'SHOW_FORM',  showForm,
-});
+})
 export const mealInput = (desc) => ({
   type: 'MEAL_INPUT',  desc,
-});
+})
 export const calInput = (cals) => ({
   type: 'CALORIES_INPUT',  cals,
-});
-export const saveMeal = {type:'SAVE_MEAL'};
+})
+export const saveMeal = {type:'SAVE_MEAL'}
 
 export const delMeal = (id) => ({
   type: 'DEL_MEAL',  id,
-});
+})
 export const editMeal = (editId) => ({
   type: 'EDIT_MEAL',  editId,
-});
+})
 
 const update = (msg, model) => {
   switch (msg.type) {
     case 'SHOW_FORM':
-      const { showForm } = msg;
-      return {...model, showForm};
+      const { showForm } = msg
+      return {...model, showForm}
     case 'MEAL_INPUT':
-      const { desc } = msg;
-      return {...model, desc};
+      const { desc } = msg
+      return {...model, desc}
     case 'CALORIES_INPUT':
-      const { cals }  = msg;
-      return {...model, cals};
+      const { cals }  = msg
+      return {...model, cals}
     case 'SAVE_MEAL':
-      const { editId } = model;
-      return (editId) ? edit(model) : add(model);
+      const { editId } = model
+      return (editId) ? edit(model) : add(model)
     case 'DEL_MEAL':
-      const { id } = msg;
-      const meals = R.filter( meal => meal.id !== id, model.meals);
-      return {...model, meals};
+      const { id } = msg
+      const meals = R.filter( meal => meal.id !== id, model.meals)
+      return {...model, meals}
     case 'EDIT_MEAL': { // <- scoping vars
-      const { editId } = msg;
-      const meal = R.find( meal => meal.id === editId, model.meals);
-      const { cals, desc } = meal;
-      return {...model, desc, cals, editId, showForm:true};
+      const { editId } = msg
+      const meal = R.find( meal => meal.id === editId, model.meals)
+      const { cals, desc } = meal
+      return {...model, desc, cals, editId, showForm:true}
     }
   }
-  console.log('update default');
-  return model;
+  console.log('update default')
+  return model
 }
 
 const add = (model) => {
-  const { nextId, cals, desc } = model;
-  const meal = { id: nextId, cals, desc };
-  const meals = [...model.meals, meal];
-  return {...model, cals:0, desc:'', showForm:false, nextId:nextId+1, meals};
+  const { nextId, cals, desc } = model
+  const meal = { id: nextId, cals, desc }
+  const meals = [...model.meals, meal]
+  return {...model, cals:0, desc:'', showForm:false, nextId:nextId+1, meals}
 }
 const edit = (model) => {
-  const { editId, cals, desc } = model;
+  const { editId, cals, desc } = model
   const meals = R.map( meal => {
       if (meal.id === editId)
-        return {...meal, cals, desc};
-      return meal;
-    }, model.meals);
-  return {...model, cals:0, desc:'', showForm:false, editId:null, meals};
+        return {...meal, cals, desc}
+      return meal
+    }, model.meals)
+  return {...model, cals:0, desc:'', showForm:false, editId:null, meals}
 }
 ```
 
@@ -203,17 +203,17 @@ const edit = (model) => {
 
 ```javascript
 function app(initModel, update, view, node) {
-  let model = initModel;
-  let curView = view(actions, model);
-  let rootNode = createElement(curView);
-  node.appendChild(rootNode);
+  let model = initModel
+  let curView = view(actions, model)
+  let rootNode = createElement(curView)
+  node.appendChild(rootNode)
 
   function actions(msg) {
-    model = update(msg, model);
-    const updatedView = view(actions, model);
-    const patches = diff(curView, updatedView);
-    rootNode = patch(rootNode, patches);
-    curView = updatedView;
+    model = update(msg, model)
+    const updatedView = view(actions, model)
+    const patches = diff(curView, updatedView)
+    rootNode = patch(rootNode, patches)
+    curView = updatedView
   }
 }
 ```
@@ -221,7 +221,7 @@ function app(initModel, update, view, node) {
 ### Reaction Mechanism - Meiosis Pattern
 
 ```javascript
-const update = stream();
-const states = stream.scan(P, app.initialState, update);
-const actions = app.actions(update, app.initialState);
+const update = stream()
+const states = stream.scan(merge, app.initialState, update)
+const actions = app.actions(update, states)
 ```
