@@ -1,9 +1,9 @@
 import hh from 'hyperscript-helpers';
 import * as R from 'rambda';
-import { h } from 'virtual-dom';
-import { delMeal, editMeal } from './Model';
+import m from 'mithril';
 
-const { div, i, table, thead, tbody, tr, th, td} = hh(h);
+
+const { div, i, table, thead, tbody, tr, th, td} = hh(m);
 
 const t = (tag, className, value, onclick=null) => tag({className, onclick}, value);
 
@@ -22,9 +22,9 @@ const mealRow = R.curry( (className, actions, meal) =>
     t(td,'pa2 tr', meal.cals ),
     t(td,'pa2 tr', [
         t(i,'ph1 fa fa-trash-alt pointer', '',
-            (e) => actions(delMeal(meal.id)) ),
+            (e) => actions.delMeal(meal.id) ),
         t(i,'ph1 fa fa-edit pointer', '',
-            (e) => actions(editMeal(meal.id)) ),
+            (e) => actions.editMeal(meal.id) ),
     ]),
   ])
 );

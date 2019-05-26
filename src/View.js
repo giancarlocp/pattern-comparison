@@ -1,10 +1,10 @@
 import hh from 'hyperscript-helpers'
-import { h } from 'virtual-dom'
+import m from 'mithril'
 
-import { calInput, mealInput, showFormF, saveMeal } from './Model'
+
 import tableView from './Table'
 
-const { button, div, form, h1, h2, input, label, pre } = hh(h)
+const { button, div, form, h1, h2, input, label, pre } = hh(m)
 
 const t = (tag, className, value) => tag({className, onclick}, value)
 const btn=(className,type, value, onclick) => button({className, onclick, type}, value)
@@ -19,7 +19,7 @@ const btnSet = (actions) =>
   div([
     btn('pv2 ph3 bg-blue white bn mr2 dim', 'submit', 'Save', ),
     btn('pv2 ph3 bg-light-gray bn dim',     'button', 'Cancel',
-        (e) => actions(showFormF(false)) ),
+        (e) => actions.showFormF(false) ),
   ])
 const formView = (actions, model) => {
   const { desc, cals, showForm } = model
@@ -28,28 +28,30 @@ const formView = (actions, model) => {
         className:'w-100 mv2',
         onsubmit: (e) => {
           e.preventDefault()
-          actions(saveMeal) }
+          actions.saveMeal() }
       },[
         fieldSet('Meal', 'text', desc,
-            (e) => actions(mealInput(e.target.value)) ),
+            (e) => actions.mealInput(e.target.value) ),
         fieldSet('Calories', 'number', cals || '',
-            (e) => actions(calInput(parseInt(e.target.value)))  ),
+            (e) => actions.calInput(parseInt(e.target.value)) ),
         btnSet(actions),
     ])
   return btn('pv2 ph3 bg-blue white bn br4','button','Add Meal',
-            () => actions(showFormF(true))
-  )
+            () => actions.showFormF(true) )
 }
 
-const AppView = (actions, model) =>
-  div( { className:'mw6 center', },
-    [
-      t(h1, 'f2 pv2', 'Elm Pattern + virtual-dom'),
+// Mithril part
+const AppView = {
+  view: (vnode) => {
+    let { state, actions } = vnode.attrs
+    return div( {className:'mw6 center'}, [
+      t(h1, 'f2 pv2', 'Meiosis Pattern + Mithril'),
       t(h2, 'f2 pv2 bb', 'Calorie Counter'),
-      formView(actions, model),
-      tableView(actions, model.meals),
-      pre( JSON.stringify(model, null, 2) ),
-    ]
-  )
+      formView(actions, state),
+      tableView(actions, state.meals),
+      m("pre", JSON.stringify(state, null, 4)),
+    ])
+  }
+}
 
 export default AppView

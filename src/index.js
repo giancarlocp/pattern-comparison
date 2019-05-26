@@ -1,26 +1,20 @@
-import initModel  from './Model'
-import { Update } from './Model'
-import AppView    from './View'
+import AppView from './View'
+import app     from './Model'
 
-import { diff, patch } from 'virtual-dom'
-import createElement from 'virtual-dom/create-element'
+import m from 'mithril'
+import stream from 'mithril/stream'
+import merge  from 'mergerino'
 
-// Elm Pattern -> Impure function (Side effect)
-function elmApp(initModel, update, view, node) {
-  let model = initModel
-  let curView = view(actions, model)
-  let rootNode = createElement(curView)
-  node.appendChild(rootNode)
-  
-  function actions(msg) {
-    model = update(msg, model)
-    const updatedView = view(actions, model)
-    const patches = diff(curView, updatedView)
-    rootNode = patch(rootNode, patches)
-    curView = updatedView
-  }
+// Meiosis Pattern
+const update = stream()
+const states = stream.scan(merge, app.initialState, update)
+const actions = app.actions(update, states)
+
+// Mithril part
+const mainView = {
+  view: (vnodes) => m(AppView, { state: states(), actions })
 }
 
 const node = document.getElementById('app')
-elmApp(initModel, Update, AppView, node)
+m.mount(node, mainView)
 console.log('It Worked!')
